@@ -1,10 +1,11 @@
 {
   "name": "alhasoubababi-push-server",
-  "version": "1.0.0",
-  "description": "سيرفر إشعارات Push لموقع الحسوبابابي (نسخة Vercel)",
+  "version": "1.1.0",
+  "description": "سيرفر إشعارات Push + لوحة تحكم إدارية لموقع الحسوبابابي",
   "dependencies": {
     "@upstash/redis": "^1.31.6",
     "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
     "web-push": "^3.6.7"
   }
 }
