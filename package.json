@@ -1,0 +1,17 @@
+{
+  "name": "alhasoubababi-push-server",
+  "version": "1.0.0",
+  "description": "سيرفر إشعارات Push لموقع الحسوبابابي",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.31.6",
+    "express": "^4.19.2",
+    "web-push": "^3.6.7"
+  }
+}
