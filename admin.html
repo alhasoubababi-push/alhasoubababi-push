@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التحكم | الحسوبابابي</title>
+<meta name="robots" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;800;900&family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0B0F19; --ink-2:#141B2C; --accent:#00A8E8; --accent-2:#16DB93; --danger:#E4483A;
+  --bg:#F4F6FA; --surface:#fff; --border:#E3E8F0; --text:#333B4D; --muted:#7C8499;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+h1,h2,h3{font-family:'Tajawal',sans-serif;}
+button{font-family:inherit;cursor:pointer;border:none;}
+input,select,textarea{font-family:inherit;}
+
+/* ---------- شاشة الدخول ---------- */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-card{background:#fff;border-radius:20px;padding:40px 32px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.08);}
+.login-card h1{font-size:22px;font-weight:900;color:var(--ink);margin-bottom:6px;text-align:center;}
+.login-card p{color:var(--muted);font-size:13.5px;text-align:center;margin-bottom:28px;}
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.field input{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-size:14.5px;}
+.field input:focus{outline:none;border-color:var(--accent);}
+.btn-submit{width:100%;background:var(--ink);color:#fff;padding:13px;border-radius:10px;font-weight:800;font-size:15px;margin-top:8px;}
+.error-msg{color:var(--danger);font-size:13px;margin-top:10px;text-align:center;display:none;}
+
+/* ---------- اللوحة ---------- */
+#dashboard{display:none;min-height:100vh;}
+.topbar{background:var(--ink);color:#fff;padding:16px 24px;display:flex;justify-content:space-between;align-items:center;}
+.topbar h1{font-size:17px;font-weight:800;}
+.logout-btn{background:rgba(255,255,255,.1);color:#fff;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:700;}
+
+.tabs{display:flex;gap:4px;background:#fff;padding:8px;overflow-x:auto;border-bottom:1px solid var(--border);}
+.tab-btn{padding:10px 18px;border-radius:8px;font-weight:700;font-size:13.5px;color:var(--muted);white-space:nowrap;background:transparent;}
+.tab-btn.active{background:var(--ink);color:#fff;}
+
+.panel{display:none;padding:24px;max-width:1100px;margin:0 auto;}
+.panel.active{display:block;}
+.panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px;}
+.panel-header h2{font-size:19px;font-weight:900;color:var(--ink);}
+.btn-primary{background:var(--accent);color:#fff;padding:10px 18px;border-radius:10px;font-weight:700;font-size:13.5px;}
+.btn-danger{background:var(--danger);color:#fff;padding:7px 12px;border-radius:8px;font-size:12.5px;font-weight:700;}
+.btn-outline{background:#fff;border:1.5px solid var(--border);color:var(--ink);padding:7px 12px;border-radius:8px;font-size:12.5px;font-weight:700;}
+.btn-wa{background:#16DB93;color:#06301f;padding:7px 12px;border-radius:8px;font-size:12.5px;font-weight:700;}
+
+.card-table{background:#fff;border-radius:14px;border:1px solid var(--border);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--bg);padding:12px;text-align:right;font-size:12.5px;font-weight:800;color:var(--muted);border-bottom:1px solid var(--border);}
+td{padding:12px;font-size:13.5px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.status-select{padding:6px 10px;border-radius:8px;border:1.5px solid var(--border);font-size:12.5px;font-weight:700;background:#fff;}
+.notes-input{width:100%;padding:6px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:12.5px;}
+.empty-state{padding:60px 20px;text-align:center;color:var(--muted);font-size:14px;}
+
+/* منتجات */
+.product-form{background:#fff;border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;display:none;}
+.product-form.active{display:block;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+.form-grid .full{grid-column:1/-1;}
+.form-grid label{display:block;font-size:12.5px;font-weight:700;color:var(--ink);margin-bottom:5px;}
+.form-grid input,.form-grid textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;}
+
+/* عروض */
+.offer-tabs{display:flex;gap:8px;margin-bottom:20px;}
+.offer-tab{padding:9px 16px;border-radius:100px;font-size:13px;font-weight:700;background:#fff;border:1.5px solid var(--border);color:var(--muted);}
+.offer-tab.active{background:var(--ink);color:#fff;border-color:var(--ink);}
+.offer-panel{display:none;background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;max-width:520px;}
+.offer-panel.active{display:block;}
+.offer-panel label{display:block;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:6px;margin-top:14px;}
+.offer-panel input,.offer-panel textarea,.offer-panel select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13.5px;}
+.result-box{margin-top:16px;padding:12px;border-radius:10px;background:var(--bg);font-size:13px;display:none;}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:12px 20px;border-radius:10px;font-size:13.5px;font-weight:700;z-index:999;display:none;}
+</style>
+</head>
+<body>
+
+<!-- ============ شاشة تسجيل الدخول ============ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>لوحة تحكم الحسوبابابي</h1>
+    <p>سجّل الدخول لمتابعة الطلبات والعملاء</p>
+    <form id="loginForm">
+      <div class="field">
+        <label>اسم المستخدم</label>
+        <input type="text" id="loginUsername" required autocomplete="username">
+      </div>
+      <div class="field">
+        <label>كلمة السر</label>
+        <input type="password" id="loginPassword" required autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn-submit">دخول</button>
+      <p class="error-msg" id="loginError">اسم المستخدم أو كلمة السر غير صحيحة</p>
+    </form>
+  </div>
+</div>
+
+<!-- ============ اللوحة الرئيسية ============ -->
+<div id="dashboard">
+  <div class="topbar">
+    <h1>لوحة تحكم الحسوبابابي</h1>
+    <button class="logout-btn" id="logoutBtn">تسجيل الخروج</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="leads">📋 الطلبات الواردة</button>
+    <button class="tab-btn" data-tab="products">💰 المنتجات والأسعار</button>
+    <button class="tab-btn" data-tab="customers">👥 العملاء</button>
+    <button class="tab-btn" data-tab="offers">📢 إرسال عروض</button>
+  </div>
+
+  <!-- ---- تبويب: الطلبات ---- -->
+  <div class="panel active" id="panel-leads">
+    <div class="panel-header">
+      <h2>الطلبات الواردة</h2>
+      <button class="btn-outline" id="refreshLeads">🔄 تحديث</button>
+    </div>
+    <div class="card-table">
+      <table>
+        <thead>
+          <tr><th>الاسم</th><th>الهاتف</th><th>المدينة</th><th>النوع</th><th>الحالة</th><th>ملاحظات</th><th>التاريخ</th><th></th></tr>
+        </thead>
+        <tbody id="leadsBody"></tbody>
+      </table>
+      <div class="empty-state" id="leadsEmpty" style="display:none;">لسه مفيش طلبات واردة</div>
+    </div>
+  </div>
+
+  <!-- ---- تبويب: المنتجات ---- -->
+  <div class="panel" id="panel-products">
+    <div class="panel-header">
+      <h2>المنتجات والأسعار</h2>
+      <button class="btn-primary" id="showProductForm">+ إضافة منتج</button>
+    </div>
+    <div class="product-form" id="productForm">
+      <div class="form-grid">
+        <div><label>اسم المنتج</label><input type="text" id="pName" placeholder="مثال: باقة 4 كاميرات"></div>
+        <div><label>التصنيف</label><input type="text" id="pCategory" placeholder="كاميرات / شبكات / طاقة شمسية"></div>
+        <div><label>السعر (جنيه سوداني)</label><input type="number" id="pPrice" placeholder="150000"></div>
+        <div><label>الحالة</label>
+          <select id="pActive" style="width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;">
+            <option value="true">فعّال</option>
+            <option value="false">متوقف</option>
+          </select>
+        </div>
+        <div class="full"><label>الوصف</label><textarea id="pDescription" rows="2" placeholder="تفاصيل مختصرة عن المنتج"></textarea></div>
+      </div>
+      <button class="btn-primary" id="saveProductBtn">حفظ المنتج</button>
+      <button class="btn-outline" id="cancelProductBtn" style="margin-right:8px;">إلغاء</button>
+      <input type="hidden" id="pEditId">
+    </div>
+    <div class="card-table">
+      <table>
+        <thead><tr><th>المنتج</th><th>التصنيف</th><th>السعر</th><th>الحالة</th><th></th></tr></thead>
+        <tbody id="productsBody"></tbody>
+      </table>
+      <div class="empty-state" id="productsEmpty" style="display:none;">لسه مفيش منتجات مضافة</div>
+    </div>
+  </div>
+
+  <!-- ---- تبويب: العملاء ---- -->
+  <div class="panel" id="panel-customers">
+    <div class="panel-header">
+      <h2>العملاء</h2>
+      <button class="btn-outline" id="refreshCustomers">🔄 تحديث</button>
+    </div>
+    <div class="card-table">
+      <table>
+        <thead><tr><th>الاسم</th><th>الهاتف</th><th>المدينة</th><th>عدد الطلبات</th><th>آخر طلب</th><th>ملاحظة متابعة</th></tr></thead>
+        <tbody id="customersBody"></tbody>
+      </table>
+      <div class="empty-state" id="customersEmpty" style="display:none;">لسه مفيش عملاء مسجّلين</div>
+    </div>
+  </div>
+
+  <!-- ---- تبويب: العروض ---- -->
+  <div class="panel" id="panel-offers">
+    <div class="panel-header"><h2>إرسال عروض</h2></div>
+    <div class="offer-tabs">
+      <button class="offer-tab active" data-offer="push">🔔 إشعار Push جماعي</button>
+      <button class="offer-tab" data-offer="whatsapp">💬 واتساب لعميل محدد</button>
+    </div>
+
+    <div class="offer-panel active" id="offer-push">
+      <label>عنوان الإشعار</label>
+      <input type="text" id="pushTitle" placeholder="عرض خاص هذا الأسبوع">
+      <label>نص الإشعار</label>
+      <textarea id="pushBody" rows="3" placeholder="خصم 10% على تركيب كاميرات هذا الأسبوع"></textarea>
+      <label>رابط عند الضغط (اختياري)</label>
+      <input type="text" id="pushUrl" placeholder="/#pricing" value="/">
+      <button class="btn-primary" style="margin-top:16px;" id="sendPushBtn">إرسال لكل المشتركين</button>
+      <div class="result-box" id="pushResult"></div>
+    </div>
+
+    <div class="offer-panel" id="offer-whatsapp">
+      <label>اختر عميل من الطلبات (اختياري)</label>
+      <select id="waCustomerSelect"><option value="">— اختر عميل —</option></select>
+      <label>رقم الهاتف</label>
+      <input type="text" id="waPhone" placeholder="0912345678">
+      <label>نص الرسالة</label>
+      <textarea id="waMessage" rows="4" placeholder="السلام عليكم، عندنا عرض خاص على تركيب الكاميرات هذا الأسبوع..."></textarea>
+      <button class="btn-wa" style="margin-top:16px;" id="genWaLinkBtn">توليد رابط واتساب</button>
+      <div class="result-box" id="waResult"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// رابط سيرفر الإدارة/الإشعارات الفعلي
+const API_BASE = 'https://alhasoubababi-push.vercel.app';
+
+let authToken = localStorage.getItem('admin_token') || '';
+let currentLeads = [];
+
+/* ---------- أدوات مساعدة ---------- */
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => (t.style.display = 'none'), 3000);
+}
+
+async function api(path, options = {}) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+      ...(options.headers || {}),
+    },
+  });
+  if (res.status === 401) {
+    logout();
+    throw new Error('انتهت الجلسة');
+  }
+  return res.json();
+}
+
+/* ---------- تسجيل الدخول ---------- */
+function checkAuth() {
+  if (authToken) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    loadLeads();
+  } else {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+  }
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const username = document.getElementById('loginUsername').value;
+  const password = document.getElementById('loginPassword').value;
+  try {
+    const data = await api('/api/admin/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+    if (data.token) {
+      authToken = data.token;
+      localStorage.setItem('admin_token', authToken);
+      document.getElementById('loginError').style.display = 'none';
+      checkAuth();
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+    }
+  } catch (err) {
+    document.getElementById('loginError').style.display = 'block';
+  }
+});
+
+function logout() {
+  authToken = '';
+  localStorage.removeItem('admin_token');
+  checkAuth();
+}
+document.getElementById('logoutBtn').addEventListener('click', logout);
+
+/* ---------- التبويبات ---------- */
+document.querySelectorAll('.tab-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach((p) => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`panel-${btn.dataset.tab}`).classList.add('active');
+    if (btn.dataset.tab === 'leads') loadLeads();
+    if (btn.dataset.tab === 'products') loadProducts();
+    if (btn.dataset.tab === 'customers') loadCustomers();
+    if (btn.dataset.tab === 'offers') populateWaCustomerSelect();
+  });
+});
+
+/* ---------- الطلبات ---------- */
+const STATUS_OPTIONS = ['جديد', 'تم التواصل', 'مجدول', 'مكتمل', 'ملغي'];
+
+async function loadLeads() {
+  currentLeads = await api('/api/admin/leads');
+  const body = document.getElementById('leadsBody');
+  const empty = document.getElementById('leadsEmpty');
+  body.innerHTML = '';
+  empty.style.display = currentLeads.length ? 'none' : 'block';
+
+  currentLeads.forEach((lead) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(lead.name)}</td>
+      <td dir="ltr" style="text-align:left;">${escapeHtml(lead.phone)}</td>
+      <td>${escapeHtml(lead.city || '—')}</td>
+      <td>${escapeHtml(lead.facilityType || '—')}</td>
+      <td><select class="status-select" data-id="${lead.id}" data-field="status">
+        ${STATUS_OPTIONS.map((s) => `<option value="${s}" ${s === lead.status ? 'selected' : ''}>${s}</option>`).join('')}
+      </select></td>
+      <td><input class="notes-input" data-id="${lead.id}" data-field="notes" value="${escapeHtml(lead.notes || '')}" placeholder="أضف ملاحظة..."></td>
+      <td style="white-space:nowrap;font-size:12px;color:var(--muted);">${formatDate(lead.createdAt)}</td>
+      <td><button class="btn-danger" data-delete="${lead.id}">حذف</button></td>
+    `;
+    body.appendChild(tr);
+  });
+
+  body.querySelectorAll('[data-field]').forEach((el) => {
+    el.addEventListener('change', async () => {
+      await api(`/api/admin/leads/${el.dataset.id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ [el.dataset.field]: el.value }),
+      });
+      showToast('تم الحفظ');
+    });
+  });
+  body.querySelectorAll('[data-delete]').forEach((el) => {
+    el.addEventListener('click', async () => {
+      if (!confirm('متأكد من حذف الطلب؟')) return;
+      await api(`/api/admin/leads/${el.dataset.delete}`, { method: 'DELETE' });
+      loadLeads();
+    });
+  });
+}
+document.getElementById('refreshLeads').addEventListener('click', loadLeads);
+
+/* ---------- المنتجات ---------- */
+async function loadProducts() {
+  const products = await api('/api/admin/products');
+  const body = document.getElementById('productsBody');
+  const empty = document.getElementById('productsEmpty');
+  body.innerHTML = '';
+  empty.style.display = products.length ? 'none' : 'block';
+
+  products.forEach((p) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><strong>${escapeHtml(p.name)}</strong><br><span style="color:var(--muted);font-size:12px;">${escapeHtml(p.description || '')}</span></td>
+      <td>${escapeHtml(p.category || '—')}</td>
+      <td>${Number(p.price).toLocaleString()} ج.س</td>
+      <td>${p.active ? '<span style="color:var(--accent-2);font-weight:700;">فعّال</span>' : '<span style="color:var(--muted);">متوقف</span>'}</td>
+      <td style="white-space:nowrap;">
+        <button class="btn-outline" data-edit="${p.id}">تعديل</button>
+        <button class="btn-danger" data-delete-p="${p.id}" style="margin-right:6px;">حذف</button>
+      </td>
+    `;
+    body.appendChild(tr);
+  });
+
+  body.querySelectorAll('[data-edit]').forEach((el) => {
+    el.addEventListener('click', () => {
+      const p = products.find((x) => x.id === el.dataset.edit);
+      openProductForm(p);
+    });
+  });
+  body.querySelectorAll('[data-delete-p]').forEach((el) => {
+    el.addEventListener('click', async () => {
+      if (!confirm('متأكد من حذف المنتج؟')) return;
+      await api(`/api/admin/products/${el.dataset.deleteP}`, { method: 'DELETE' });
+      loadProducts();
+    });
+  });
+}
+
+function openProductForm(p) {
+  document.getElementById('productForm').classList.add('active');
+  document.getElementById('pEditId').value = p ? p.id : '';
+  document.getElementById('pName').value = p ? p.name : '';
+  document.getElementById('pCategory').value = p ? p.category : '';
+  document.getElementById('pPrice').value = p ? p.price : '';
+  document.getElementById('pDescription').value = p ? p.description : '';
+  document.getElementById('pActive').value = p ? String(p.active) : 'true';
+}
+document.getElementById('showProductForm').addEventListener('click', () => openProductForm(null));
+document.getElementById('cancelProductBtn').addEventListener('click', () => {
+  document.getElementById('productForm').classList.remove('active');
+});
+document.getElementById('saveProductBtn').addEventListener('click', async () => {
+  const id = document.getElementById('pEditId').value;
+  const payload = {
+    name: document.getElementById('pName').value,
+    category: document.getElementById('pCategory').value,
+    price: Number(document.getElementById('pPrice').value),
+    description: document.getElementById('pDescription').value,
+    active: document.getElementById('pActive').value === 'true',
+  };
+  if (!payload.name || !payload.price) { showToast('الاسم والسعر مطلوبان'); return; }
+
+  if (id) {
+    await api(`/api/admin/products/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
+  } else {
+    await api('/api/admin/products', { method: 'POST', body: JSON.stringify(payload) });
+  }
+  document.getElementById('productForm').classList.remove('active');
+  showToast('تم الحفظ');
+  loadProducts();
+});
+
+/* ---------- العملاء ---------- */
+async function loadCustomers() {
+  const customers = await api('/api/admin/customers');
+  const body = document.getElementById('customersBody');
+  const empty = document.getElementById('customersEmpty');
+  body.innerHTML = '';
+  empty.style.display = customers.length ? 'none' : 'block';
+
+  customers.forEach((c) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(c.name)}</td>
+      <td dir="ltr" style="text-align:left;">${escapeHtml(c.phone)}</td>
+      <td>${escapeHtml(c.city || '—')}</td>
+      <td>${c.requestsCount}</td>
+      <td style="font-size:12px;color:var(--muted);">${formatDate(c.lastRequestAt)}</td>
+      <td><input class="notes-input" data-phone="${c.phone}" value="${escapeHtml(c.note || '')}" placeholder="ملاحظة متابعة..."></td>
+    `;
+    body.appendChild(tr);
+  });
+
+  body.querySelectorAll('[data-phone]').forEach((el) => {
+    el.addEventListener('change', async () => {
+      await api(`/api/admin/customers/${encodeURIComponent(el.dataset.phone)}/note`, {
+        method: 'PATCH',
+        body: JSON.stringify({ note: el.value }),
+      });
+      showToast('تم حفظ الملاحظة');
+    });
+  });
+}
+document.getElementById('refreshCustomers').addEventListener('click', loadCustomers);
+
+/* ---------- العروض ---------- */
+document.querySelectorAll('.offer-tab').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.offer-tab').forEach((b) => b.classList.remove('active'));
+    document.querySelectorAll('.offer-panel').forEach((p) => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(`offer-${btn.dataset.offer}`).classList.add('active');
+  });
+});
+
+document.getElementById('sendPushBtn').addEventListener('click', async () => {
+  const title = document.getElementById('pushTitle').value;
+  const body = document.getElementById('pushBody').value;
+  const url = document.getElementById('pushUrl').value || '/';
+  if (!title || !body) { showToast('العنوان والنص مطلوبان'); return; }
+
+  const data = await api('/api/admin/send-offer/push', { method: 'POST', body: JSON.stringify({ title, body, url }) });
+  const box = document.getElementById('pushResult');
+  box.style.display = 'block';
+  box.textContent = `تم الإرسال إلى ${data.sent} من أصل ${data.total} مشترك`;
+});
+
+function populateWaCustomerSelect() {
+  const select = document.getElementById('waCustomerSelect');
+  select.innerHTML = '<option value="">— اختر عميل —</option>';
+  currentLeads.forEach((lead) => {
+    const opt = document.createElement('option');
+    opt.value = lead.phone;
+    opt.textContent = `${lead.name} — ${lead.phone}`;
+    select.appendChild(opt);
+  });
+}
+document.getElementById('waCustomerSelect').addEventListener('change', (e) => {
+  if (e.target.value) document.getElementById('waPhone').value = e.target.value;
+});
+
+document.getElementById('genWaLinkBtn').addEventListener('click', async () => {
+  const phone = document.getElementById('waPhone').value;
+  const message = document.getElementById('waMessage').value;
+  if (!phone || !message) { showToast('رقم الهاتف والرسالة مطلوبان'); return; }
+
+  const data = await api('/api/admin/send-offer/whatsapp-link', { method: 'POST', body: JSON.stringify({ phone, message }) });
+  const box = document.getElementById('waResult');
+  box.style.display = 'block';
+  box.innerHTML = `<a href="${data.link}" target="_blank" style="color:var(--accent);font-weight:700;">فتح المحادثة على واتساب ↗</a>`;
+});
+
+/* ---------- أدوات عامة ---------- */
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+function formatDate(iso) {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('ar-SD', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+checkAuth();
+</script>
+</body>
+</html>
